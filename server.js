@@ -16,9 +16,9 @@ const db = mysql.createConnection({
   port: process.env.DB_PORT,
 });
 
-conexion.connect((error) => {
+db.connect((error) => {
   if (error) {
-    console.error(error);
+    console.error("Error conectando a MySQL:", error);
     return;
   }
 
@@ -29,27 +29,24 @@ app.get("/", (req, res) => {
   res.send("API funcionando");
 });
 
-app.listen(3000, () => {
-  console.log("Servidor ejecutándose en puerto 3000");
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Servidor ejecutándose en puerto ${process.env.PORT || 3000}`);
 });
 
 app.get("/documentos", (req, res) => {
-  conexion.query(
-    "SELECT * FROM documentos ORDER BY id DESC",
-    (error, resultados) => {
-      if (error) {
-        return res.status(500).json(error);
-      }
+  db.query("SELECT * FROM documentos ORDER BY id DESC", (error, resultados) => {
+    if (error) {
+      return res.status(500).json(error);
+    }
 
-      res.json(resultados);
-    },
-  );
+    res.json(resultados);
+  });
 });
 
 app.post("/documentos", (req, res) => {
   const { numero, asunto, descripcion } = req.body;
 
-  conexion.query(
+  db.query(
     `
         INSERT INTO documentos
         (
@@ -104,7 +101,7 @@ app.put("/documentos/:id/estado", (req, res) => {
     valores = [estado, id];
   }
 
-  conexion.query(sql, valores, (error, resultado) => {
+  db.query(sql, valores, (error, resultado) => {
     if (error) {
       return res.status(500).json(error);
     }
@@ -117,7 +114,7 @@ app.put("/documentos/:id/estado", (req, res) => {
 app.post("/seguimientos", (req, res) => {
   const { documento_id, detalle } = req.body;
 
-  conexion.query(
+  db.query(
     `
         INSERT INTO seguimientos
         (
@@ -141,7 +138,7 @@ app.post("/seguimientos", (req, res) => {
 app.get("/seguimientos/:documentoId", (req, res) => {
   const documentoId = req.params.documentoId;
 
-  conexion.query(
+  db.query(
     `
         SELECT *
         FROM seguimientos
@@ -162,7 +159,7 @@ app.put("/seguimientos/:id", (req, res) => {
   const id = req.params.id;
   const { detalle } = req.body;
 
-  conexion.query(
+  db.query(
     `
         UPDATE seguimientos
         SET detalle = ?
@@ -183,7 +180,7 @@ app.put("/seguimientos/:id", (req, res) => {
 app.delete("/seguimientos/:id", (req, res) => {
   const id = req.params.id;
 
-  conexion.query(
+  db.query(
     `
         DELETE FROM seguimientos
         WHERE id = ?
