@@ -1,0 +1,4 @@
+- Revisar/ajustar `server.js` para Railway (conexión MySQL y puerto)
+- Asegurar dependencias en `package.json` (dotenv si se requiere)
+- Instrucciones para desplegar en Railway
+- Probar despliegue / logs
